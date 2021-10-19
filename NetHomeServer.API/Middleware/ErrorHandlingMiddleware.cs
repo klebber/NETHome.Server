@@ -37,7 +37,7 @@ namespace NetHomeServer.API.Middleware
             else if (exception is AuthenticationException) code = HttpStatusCode.Unauthorized;
             else if (exception is AuthorizationException) code = HttpStatusCode.Forbidden;
 
-            var result = JsonSerializer.Serialize(new { Error = exception.Message });
+            var result = JsonSerializer.Serialize(new { exception.Message });
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)code;
             return context.Response.WriteAsync(result);

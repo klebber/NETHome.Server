@@ -6,6 +6,7 @@ using NetHomeServer.Core.Services;
 using NetHomeServer.Data.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,7 +16,6 @@ namespace NetHomeServer.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -24,25 +24,26 @@ namespace NetHomeServer.API.Controllers
             _userService = userService;
         }
 
-        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        public async Task<LoginResponseModel> Login([FromBody] LoginModel login)
         {
-            return Ok(await _userService.Login(login));
+            Debug.WriteLine("Login user: " + login.Username);
+            return await _userService.Login(login);
         }
 
-        [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
+        public async Task Register([FromBody] RegisterModel registerModel)
         {
+            Debug.WriteLine("Register user: " + registerModel.Username);
             await _userService.Register(registerModel);
-            return Ok();
         }
 
+        [Authorize]
         [HttpGet("validate")]
-        public async Task<IActionResult> Validate()
+        public async Task<UserModel> Validate()
         {
-            return Ok(await _userService.Validate(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            Debug.WriteLine("Validate user: " + User.Identity.Name);
+            return await _userService.Validate(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
     }
 }

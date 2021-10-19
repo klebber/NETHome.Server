@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NetHomeServer.API.Hubs;
 using NetHomeServer.API.Middleware;
 using NetHomeServer.Core.Exceptions;
 using NetHomeServer.Core.Services;
@@ -42,7 +43,7 @@ namespace NetHomeServer.API
             })
             .AddJwtBearer(options =>
             {
-                //options.RequireHttpsMetadata = false;
+                options.RequireHttpsMetadata = false; //TODO
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
@@ -58,52 +59,54 @@ namespace NetHomeServer.API
                     {
                         var id = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
                         var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
-                        if (await userManager.FindByIdAsync(id) == null)
-                            throw new AuthorizationException("Unable to verify user from token data!");
-                    }
-                    //OnMessageReceived = context =>
-                    //{
-                    //    var accessToken = context.Request.Query["access_token"];
+                        var user = await userManager.FindByIdAsync(id) ?? throw new AuthorizationException("Unable to verify token!");
+                        var claims = new ClaimsIdentity();
+                        foreach (string role in await userManager.GetRolesAsync(user))
+                            claims.AddClaim(new Claim(ClaimTypes.Role, role));
+                        context.Principal.AddIdentity(claims);
+                    },
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
 
-                    //    var path = context.HttpContext.Request.Path;
-                    //    if (!string.IsNullOrEmpty(accessToken) &&
-                    //        (path.StartsWithSegments("/nethomehub")))
-                    //    {
-                    //        context.Token = accessToken;
-                    //    }
-                    //    return Task.CompletedTask;
-                    //}
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/nethomehub")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
             services.AddAuthorization();
             services.AddDbContext<NetHomeContext>(options => options.UseSqlite(Configuration.GetConnectionString("NetHomeContextConnection")));
             services.AddIdentityCore<User>(options => 
-                {
-                    options.SignIn.RequireConfirmedAccount = false;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequiredLength = 4;
-                })
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<NetHomeContext>();
-            services.AddControllers();
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredLength = 4;
+            }).AddRoles<IdentityRole>()
+              .AddEntityFrameworkStores<NetHomeContext>();
+            services.AddSignalR(options =>
+            {
+                options.KeepAliveInterval = TimeSpan.FromSeconds(3);
+                options.ClientTimeoutInterval = TimeSpan.FromSeconds(6);
+            });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ErrorHandlingMiddleware>();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -112,6 +115,7 @@ namespace NetHomeServer.API
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<NetHomeHub>("/nethomehub");
                 endpoints.MapControllers();
             });
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NetHomeServer.Data.Entities;
 using NetHomeServer.Data.Entities.Devices;
@@ -13,7 +14,6 @@ namespace NetHomeServer.Data
     public class NetHomeContext : IdentityDbContext<User>
     {
         public DbSet<User> User { get; set; }
-        public DbSet<Role> Role { get; set; }
         public DbSet<Room> Room { get; set; }
         public DbSet<DeviceType> DeviceType { get; set; }
         public DbSet<Device> Device { get; set; }

@@ -16,6 +16,6 @@ namespace NetHomeServer.Common.Models
         public int Age { get; set; }
         public string Gender { get; set; }
         public DateTime DateOfRegistration { get; set; }
-        public RoleModel Role { get; set; }
+        public ICollection<string> Roles { get; set; }
     }
 }

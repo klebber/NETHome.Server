@@ -15,25 +15,19 @@ namespace NetHomeServer.Core.Services
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
-        private readonly UserManager<User> _userManager;
-        public TokenService(IConfiguration configuration, 
-            UserManager<User> userManager)
+        public TokenService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _userManager = userManager;
         }
-        public async Task<string> GenerateToken(User user)
+        public string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             string secret = _configuration["Jwt:Key"];
             byte[] key = Encoding.ASCII.GetBytes(secret);
-            var claims = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id), new Claim(ClaimTypes.Name, user.UserName) });
-            foreach(string role in await _userManager.GetRolesAsync(user))
-                claims.AddClaim(new Claim(ClaimTypes.Role, role));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = claims,
+                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id), new Claim(ClaimTypes.Name, user.UserName) }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
