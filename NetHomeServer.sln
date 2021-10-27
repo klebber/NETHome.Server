@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetHomeServer.API", "NetHomeServer.API\NetHomeServer.API.csproj", "{27321789-2A2B-47A1-86D0-3EBEA5C88CA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetHome.API", "NetHome.API\NetHome.API.csproj", "{D8C93174-51D5-4E35-AB3B-D1E3F7B1D8A4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetHomeServer.Data", "NetHomeServer.Data\NetHomeServer.Data.csproj", "{69D4690E-0212-419F-80B3-1E43FAA23D40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetHome.Core", "NetHome.Core\NetHome.Core.csproj", "{88AF535C-6CC2-4C42-9D31-49A01EDDA948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetHomeServer.Core", "NetHomeServer.Core\NetHomeServer.Core.csproj", "{7D28D8BC-0778-4A34-A13B-BB7D15BD6080}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetHomeServer.Common", "NetHomeServer.Common\NetHomeServer.Common.csproj", "{E6FA9D16-357B-4B0B-BEC1-6FCC1A970CBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetHome.Data", "NetHome.Data\NetHome.Data.csproj", "{D3EADF2A-A93F-4E76-AAB2-3E84EABD6650}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,22 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{27321789-2A2B-47A1-86D0-3EBEA5C88CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27321789-2A2B-47A1-86D0-3EBEA5C88CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27321789-2A2B-47A1-86D0-3EBEA5C88CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27321789-2A2B-47A1-86D0-3EBEA5C88CA2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69D4690E-0212-419F-80B3-1E43FAA23D40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69D4690E-0212-419F-80B3-1E43FAA23D40}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69D4690E-0212-419F-80B3-1E43FAA23D40}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69D4690E-0212-419F-80B3-1E43FAA23D40}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D28D8BC-0778-4A34-A13B-BB7D15BD6080}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D28D8BC-0778-4A34-A13B-BB7D15BD6080}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D28D8BC-0778-4A34-A13B-BB7D15BD6080}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D28D8BC-0778-4A34-A13B-BB7D15BD6080}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6FA9D16-357B-4B0B-BEC1-6FCC1A970CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6FA9D16-357B-4B0B-BEC1-6FCC1A970CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6FA9D16-357B-4B0B-BEC1-6FCC1A970CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6FA9D16-357B-4B0B-BEC1-6FCC1A970CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8C93174-51D5-4E35-AB3B-D1E3F7B1D8A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8C93174-51D5-4E35-AB3B-D1E3F7B1D8A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8C93174-51D5-4E35-AB3B-D1E3F7B1D8A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8C93174-51D5-4E35-AB3B-D1E3F7B1D8A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88AF535C-6CC2-4C42-9D31-49A01EDDA948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88AF535C-6CC2-4C42-9D31-49A01EDDA948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88AF535C-6CC2-4C42-9D31-49A01EDDA948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88AF535C-6CC2-4C42-9D31-49A01EDDA948}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3EADF2A-A93F-4E76-AAB2-3E84EABD6650}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3EADF2A-A93F-4E76-AAB2-3E84EABD6650}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3EADF2A-A93F-4E76-AAB2-3E84EABD6650}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3EADF2A-A93F-4E76-AAB2-3E84EABD6650}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
