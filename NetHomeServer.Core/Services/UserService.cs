@@ -31,7 +31,7 @@ namespace NetHomeServer.Core.Services
         public async Task<LoginResponseModel> Login(LoginModel login)
         {
             var user = await _userManager.FindByNameAsync(login.Username);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password)) 
+            if (user is null || !await _userManager.CheckPasswordAsync(user, login.Password)) 
                 throw new AuthenticationException("Wrong username or password!");
             var token = _tokenService.GenerateToken(user);
             var userModel = _mapper.Map<UserModel>(user);
@@ -46,7 +46,7 @@ namespace NetHomeServer.Core.Services
 
         public async Task Register(RegisterModel register)
         {
-            if (await _userManager.FindByNameAsync(register.Username) != null)
+            if (await _userManager.FindByNameAsync(register.Username) is not null)
                 throw new ValidationException("Username already in use!");
             var user = _mapper.Map<User>(register);
             user.DateOfRegistration = DateTime.Now;
@@ -61,37 +61,6 @@ namespace NetHomeServer.Core.Services
             var userModel = _mapper.Map<UserModel>(user);
             userModel.Roles = await _userManager.GetRolesAsync(user);
             return userModel;
-        }
-
-        private async Task Initialize()
-        {
-            string[] roles = new string[] { "Owner", "Admin", "Tenant" };
-
-            foreach (string role in roles)
-            {
-                if (!await _roleManager.RoleExistsAsync(role))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(role));
-                }
-            }
-            var result = await _userManager.GetUsersInRoleAsync("owner");
-
-            if (result.Count == 0)
-            {
-                User user = new()
-                {
-                    UserName = "admin",
-                    Email = "admin@home.net",
-                    EmailConfirmed = true,
-                    FirstName = "Ad",
-                    LastName = "Min",
-                    Age = 25,
-                    Gender = "Male",
-                    DateOfRegistration = DateTime.Now
-                };
-                await _userManager.CreateAsync(user, "admin");
-                await _userManager.AddToRolesAsync(user, roles);
-            }
         }
     }
 }

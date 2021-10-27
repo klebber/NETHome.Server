@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NetHomeServer.API.Helpers;
 using NetHomeServer.API.Hubs;
 using NetHomeServer.API.Middleware;
 using NetHomeServer.Core.Exceptions;
@@ -51,7 +52,8 @@ namespace NetHomeServer.API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["Jwt:Key"])),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = true
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true
                 };
                 options.Events = new JwtBearerEvents
                 {
@@ -79,7 +81,11 @@ namespace NetHomeServer.API
                     }
                 };
             });
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ElevatedRights", policy =>
+                  policy.RequireRole("Owner", "Admin"));
+            });
             services.AddDbContext<NetHomeContext>(options => options.UseSqlite(Configuration.GetConnectionString("NetHomeContextConnection")));
             services.AddIdentityCore<User>(options => 
             {
@@ -99,7 +105,12 @@ namespace NetHomeServer.API
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
-            services.AddControllers();
+            services.AddScoped<IDeviceService, DeviceService>();
+            services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new DeviceConverter());
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

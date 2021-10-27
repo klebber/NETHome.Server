@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 NetHomeDatabase.db
+/NetHomeServer.API/Controllers/DevelopmentController.cs
