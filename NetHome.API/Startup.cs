@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using NetHome.API.Helpers;
 using NetHome.API.Hubs;
 using NetHome.API.Middleware;
+using NetHome.Common.JsonConverters;
+using NetHome.Common.Models;
 using NetHome.Core.Exceptions;
 using NetHome.Core.Services;
 using NetHome.Data;
@@ -22,6 +24,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace NetHome.API
@@ -109,7 +113,8 @@ namespace NetHome.API
             services.AddControllers()
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.Converters.Add(new DeviceConverter());
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                options.JsonSerializerOptions.Converters.Add(new RuntimeTypeConverter<DeviceModel>("NetHome.Common.Models.Devices.", "NetHome.Common"));
             });
         }
 

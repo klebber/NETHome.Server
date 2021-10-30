@@ -19,6 +19,7 @@ namespace NetHome.Data
         public DbSet<Device> Device { get; set; }
         public DbSet<AirConditioner> AirConditioners { get; set; }
         public DbSet<DWSensor> DWSensor { get; set; }
+        public DbSet<THSensor> THSensor { get; set; }
         public DbSet<RGBLight> RGBLight { get; set; }
         public DbSet<RollerShutter> RollerShutter { get; set; }
         public DbSet<SmartSwitch> SmartSwitch { get; set; }

@@ -44,7 +44,12 @@ namespace NetHome.Core.Services
 
         public ICollection<DeviceModel> GetAllDevices()
         {
-            var devices = _context.Device.Include(d => d.Room).Include(d => d.Type).ToList();
+            var devices = _context.Device
+                .Include(d => d.Room)
+                .Include(d => d.Type)
+                .OrderBy(d => d.Room.Id)
+                .ThenBy(d => d.Type.Id)
+                .ToList();
             var devicemodels = _mapper.Map<List<Device>, List<DeviceModel>>(devices);
             return devicemodels;
         }
@@ -54,7 +59,10 @@ namespace NetHome.Core.Services
             var devices = _context.User
                 .Include(u => u.Devices)
                 .Single(u => u.Id == userId)
-                .Devices.ToList();
+                .Devices
+                .OrderBy(d => d.Room.Id)
+                .ThenBy(d => d.Type.Id)
+                .ToList();
             var devicemodels = _mapper.Map<List<Device>, List<DeviceModel>>(devices);
             return devicemodels;
         }

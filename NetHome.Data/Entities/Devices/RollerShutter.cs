@@ -8,6 +8,10 @@ namespace NetHome.Data.Entities.Devices
 {
     public class RollerShutter : Device
     {
-        public int Percentage { get; set; }
+        public int CurrentPercentage { get; set; }
+        public int FavPos1 { get; set; }
+        public int FavPos2 { get; set; }
+        public int FavPos3 { get; set; }
+        public int FavPos4 { get; set; }
     }
 }

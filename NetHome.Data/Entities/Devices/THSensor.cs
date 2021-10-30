@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetHome.Data.Entities.Devices
 {
-    public class DWSensor : Device
+    public class THSensor : Device
     {
-        public bool IsOpen { get; set; }
-        public string Placement { get; set; }
+        public double Temperature { get; set; }
+        public double Humidity { get; set; }
     }
 }

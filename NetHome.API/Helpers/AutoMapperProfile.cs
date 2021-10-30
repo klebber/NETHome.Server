@@ -18,17 +18,21 @@ namespace NetHome.API.Helpers
             CreateMap<User, UserModel>();
             CreateMap<RegisterRequest, User>();
 
-            CreateMap<AirConditioner, AirConditionerModel>();
-            CreateMap<DWSensor, DWSensorModel>();
-            CreateMap<RGBLight, RGBLightModel>();
-            CreateMap<RollerShutter, RollerShutterModel>();
-            CreateMap<SmartSwitch, SmartSwitchModel>();
             CreateMap<Device, DeviceModel>()
-                .Include<AirConditioner, AirConditionerModel>()
-                .Include<DWSensor, DWSensorModel>()
-                .Include<RGBLight, RGBLightModel>()
-                .Include<RollerShutter, RollerShutterModel>()
-                .Include<SmartSwitch, SmartSwitchModel>();
+                .ForMember(r => r.Room, opt => opt.MapFrom(src => src.Room.Name))
+                .ForMember(t => t.Type, opt => opt.MapFrom(src => src.Type.Name));
+            CreateMap<AirConditioner, AirConditionerModel>()
+                .IncludeBase<Device, DeviceModel>();
+            CreateMap<DWSensor, DWSensorModel>()
+                .IncludeBase<Device, DeviceModel>();
+            CreateMap<THSensor, THSensorModel>()
+                .IncludeBase<Device, DeviceModel>();
+            CreateMap<RGBLight, RGBLightModel>()
+                .IncludeBase<Device, DeviceModel>();
+            CreateMap<RollerShutter, RollerShutterModel>()
+                .IncludeBase<Device, DeviceModel>();
+            CreateMap<SmartSwitch, SmartSwitchModel>()
+                .IncludeBase<Device, DeviceModel>();
         }
     }
 }
