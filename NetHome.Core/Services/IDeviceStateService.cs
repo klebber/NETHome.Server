@@ -12,5 +12,7 @@ namespace NetHome.Core.Services
         public Task<DeviceModel> ChangeState(DeviceModel deviceModel, string userId);
         public Task<DeviceModel> RefreshState(int deviceId, string userId);
         public void StateChanged(string ip);
+        public Task StateChangedDW(string ip, string state);
+        public Task StateChangedHT(string ip, int hum, double temp);
     }
 }

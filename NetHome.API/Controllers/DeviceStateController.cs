@@ -38,6 +38,20 @@ namespace NetHome.API.Controllers
             _deviceStateService.StateChanged(GetClientIP());
         }
 
+        [LocalAddress]
+        [HttpGet("report-dw")]
+        public void ReportDW([FromQuery] string state)
+        {
+            _deviceStateService.StateChangedDW(GetClientIP(), state);
+        }
+
+        [LocalAddress]
+        [HttpGet("report-ht")]
+        public void ReportHT([FromQuery] int hum, [FromQuery] double temp)
+        {
+            _deviceStateService.StateChangedHT(GetClientIP(), hum, temp);
+        }
+
         private string GetClientIP() => Request.HttpContext.Connection.RemoteIpAddress.ToString();
     }
 }

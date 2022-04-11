@@ -6,6 +6,7 @@ using NetHome.Core.Exceptions;
 using NetHome.Core.Helpers;
 using NetHome.Data;
 using NetHome.Data.Entities;
+using NetHome.Data.Entities.Devices;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -111,6 +112,22 @@ namespace NetHome.Core.Services
         {
             var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
             return result.IsSuccessStatusCode;
+        }
+
+        public async Task StateChangedDW(string ip, string state)
+        {
+            DWSensor dw = (DWSensor)await _context.Device.SingleAsync(d => d.IpAdress == ip && d.GetType() == typeof(DWSensor));
+            bool newValue = state == "True" || (state == "False" ? false : throw new InvalidOperationException());
+            dw.IsOpen = newValue;
+            _context.SaveChanges();
+        }
+
+        public async Task StateChangedHT(string ip, int hum, double temp)
+        {
+            THSensor th = (THSensor)await _context.Device.SingleAsync(d => d.IpAdress == ip && d.GetType() == typeof(THSensor));
+            th.Humidity = hum;
+            th.Temperature = temp;
+            _context.SaveChanges();
         }
     }
 }
