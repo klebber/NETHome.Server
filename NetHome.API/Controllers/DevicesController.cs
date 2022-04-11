@@ -23,25 +23,22 @@ namespace NetHome.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get/{id}")]
-        public DeviceModel Get(int id)
+        [HttpGet("get")]
+        public async Task<DeviceModel> Get([FromQuery] int id)
         {
-            return _deviceService.GetDevice(id, User.FindFirstValue(ClaimTypes.NameIdentifier), User.IsInRole("Admin") || User.IsInRole("Owner"));
+            return await _deviceService.GetDevice(id, User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
-        
+
         [Authorize]
         [HttpGet("getall")]
-        public ICollection<DeviceModel> GetAll()
+        public async Task<ICollection<DeviceModel>> GetAll()
         {
-            Debug.WriteLine("GetAll request from user: " + User.Identity.Name);
-            return User.IsInRole("Admin") || User.IsInRole("Owner")
-                ? _deviceService.GetAllDevices()
-                : _deviceService.GetDevicesForUser(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            return await _deviceService.GetAllDevices(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
         [Authorize(Policy = "ElevatedRights")]
         [HttpPost("add")]
-        public void Add(DeviceModel device)
+        public async Task Add([FromBody] DeviceModel device)
         {
             throw new NotImplementedException();
         }

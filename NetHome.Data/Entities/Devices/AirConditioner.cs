@@ -14,5 +14,20 @@ namespace NetHome.Data.Entities.Devices
         public bool Swing { get; set; }
         public bool TimerSet { get; set; }
         public double TimerValue { get; set; }
+
+        public override Uri ChangeState(Device newValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Uri RetrieveStateUri()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryUpdateValues(Dictionary<string,string> values)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

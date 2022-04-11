@@ -10,5 +10,20 @@ namespace NetHome.Data.Entities.Devices
     {
         public double Temperature { get; set; }
         public double Humidity { get; set; }
+
+        public override Uri ChangeState(Device newValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Uri RetrieveStateUri()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryUpdateValues(Dictionary<string, string> values)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

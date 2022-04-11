@@ -9,8 +9,7 @@ namespace NetHome.Core.Services
 {
     public interface IDeviceService
     {
-        public DeviceModel GetDevice(int deviceId, string userId, bool elevatedRights);
-        public ICollection<DeviceModel> GetAllDevices();
-        public ICollection<DeviceModel> GetDevicesForUser(string userId);
+        public Task<DeviceModel> GetDevice(int deviceId, string userId);
+        public Task<ICollection<DeviceModel>> GetAllDevices(string userId);
     }
 }

@@ -21,6 +21,7 @@ using NetHome.Data;
 using NetHome.Data.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -110,6 +111,7 @@ namespace NetHome.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IDeviceService, DeviceService>();
+            services.AddScoped<IDeviceStateService, DeviceStateService>();
             services.AddControllers()
             .AddJsonOptions(options =>
             {

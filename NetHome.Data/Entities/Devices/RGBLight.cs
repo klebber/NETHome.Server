@@ -16,5 +16,20 @@ namespace NetHome.Data.Entities.Devices
         public int Blue { get; set; }
         public int White { get; set; }
         public int Gain { get; set; }
+
+        public override Uri ChangeState(Device newValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Uri RetrieveStateUri()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryUpdateValues(Dictionary<string, string> values)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
