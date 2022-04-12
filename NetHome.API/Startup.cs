@@ -11,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NetHome.API.Helpers;
-using NetHome.API.Hubs;
 using NetHome.API.Middleware;
 using NetHome.Common.JsonConverters;
 using NetHome.Common.Models;
@@ -71,18 +70,6 @@ namespace NetHome.API
                         foreach (string role in await userManager.GetRolesAsync(user))
                             claims.AddClaim(new Claim(ClaimTypes.Role, role));
                         context.Principal.AddIdentity(claims);
-                    },
-                    OnMessageReceived = context =>
-                    {
-                        var accessToken = context.Request.Query["access_token"];
-
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/nethomehub")))
-                        {
-                            context.Token = accessToken;
-                        }
-                        return Task.CompletedTask;
                     }
                 };
             });
@@ -133,7 +120,6 @@ namespace NetHome.API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<NetHomeHub>("/nethomehub");
                 endpoints.MapControllers();
             });
         }
