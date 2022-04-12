@@ -1,6 +1,7 @@
 ﻿using NetHome.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,7 @@ namespace NetHome.Core.Services
     {
         public Task<DeviceModel> ChangeState(DeviceModel deviceModel, string userId);
         public Task<DeviceModel> RefreshState(int deviceId, string userId);
-        public void StateChanged(string ip);
-        public Task StateChangedDW(string ip, string state);
-        public Task StateChangedHT(string ip, int hum, double temp);
+        public Task StateChanged(string ip);
+        public Task StateChanged(string ip, NameValueCollection values);
     }
 }

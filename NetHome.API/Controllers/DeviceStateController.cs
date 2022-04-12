@@ -5,6 +5,7 @@ using NetHome.Common.Models;
 using NetHome.Core.Services;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace NetHome.API.Controllers
 {
@@ -35,21 +36,10 @@ namespace NetHome.API.Controllers
         [HttpGet("report")]
         public void ReportStateChanged()
         {
-            _deviceStateService.StateChanged(GetClientIP());
-        }
-
-        [LocalAddress]
-        [HttpGet("report-dw")]
-        public void ReportDW([FromQuery] string state)
-        {
-            _deviceStateService.StateChangedDW(GetClientIP(), state);
-        }
-
-        [LocalAddress]
-        [HttpGet("report-ht")]
-        public void ReportHT([FromQuery] int hum, [FromQuery] double temp)
-        {
-            _deviceStateService.StateChangedHT(GetClientIP(), hum, temp);
+            if (HttpContext.Request.Query.Count == 0)
+                _deviceStateService.StateChanged(GetClientIP());
+            else
+                _deviceStateService.StateChanged(GetClientIP(), HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value));
         }
 
         private string GetClientIP() => Request.HttpContext.Connection.RemoteIpAddress.ToString();

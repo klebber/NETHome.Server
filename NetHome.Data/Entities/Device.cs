@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,6 @@ namespace NetHome.Data.Entities
 
         public abstract Uri ChangeState(Device newValue);
         public abstract Uri RetrieveStateUri();
-        public abstract bool TryUpdateValues(Dictionary<string, string> values);
+        public abstract bool TryUpdateValues(NameValueCollection values);
     }
 }

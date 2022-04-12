@@ -6,13 +6,11 @@ using NetHome.Core.Exceptions;
 using NetHome.Core.Helpers;
 using NetHome.Data;
 using NetHome.Data.Entities;
-using NetHome.Data.Entities.Devices;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -47,10 +45,15 @@ namespace NetHome.Core.Services
             return ExecuteRequest(deviceId);
         }
 
-        public void StateChanged(string ip)
+        public async Task StateChanged(string ip)
         {
-            var deviceId = _context.Device.Where(d => d.IpAdress == ip).Select(d => d.Id).Single();
+            var deviceId = await _context.Device.Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
             ExecuteRequest(deviceId);
+        }
+        public async Task StateChanged(string ip, NameValueCollection values)
+        {
+            var deviceId = await _context.Device.Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
+            ExecuteRequest(deviceId, values);
         }
 
         private async Task CheckExistenceAndAccess(int deviceId, string userId)
@@ -72,39 +75,65 @@ namespace NetHome.Core.Services
             throw new AuthorizationException("You do not have access to this device!");
         }
 
-        private DeviceModel ExecuteRequest(int deviceId, Device newValue = null)
+        private DeviceModel ExecuteRequest(int deviceId)
         {
-            bool result = false;
-            Device device = null;
             lock (LockManager.GetDeviceLock(deviceId))
             {
-                try
+                var device = _context.Device.Single(d => d.Id == deviceId);
+                var uri = device.RetrieveStateUri();
+                if (uri is null)
+                    throw new SystemException("Unable to complete requested action!");
+                if (uri.IsLoopback)
+                    return _mapper.Map<DeviceModel>(device);
+                if (HandleRetrieveStateRequest(uri, device))
                 {
-                    device = _context.Device.Single(d => d.Id == deviceId);
-                    Uri uri = newValue is null ? device.RetrieveStateUri() : device.ChangeState(newValue);
-                    if (uri is not null)
-                    {
-                        result = newValue is null ? HandleRetrieveStateRequest(uri, device) : HandleChangeStateRequest(uri);
-                        if (result) _context.SaveChanges();
-                    }
-                    else
-                    {
-                        result = true;
-                    }
+                    _context.SaveChanges();
+                    return _mapper.Map<DeviceModel>(device);
                 }
-                catch (Exception)
+                throw new SystemException("Unable to complete requested action!");
+            }
+        }
+
+        private DeviceModel ExecuteRequest(int deviceId, Device newValue)
+        {
+            lock (LockManager.GetDeviceLock(deviceId))
+            {
+                var device = _context.Device.Single(d => d.Id == deviceId);
+                var uri = device.ChangeState(newValue);
+                if (uri is not null && HandleChangeStateRequest(uri))
                 {
-                    result = false;
+                    _context.SaveChanges();
+                    return _mapper.Map<DeviceModel>(device);
+                }
+                else
+                {
+                    throw new SystemException("Unable to complete requested action!");
                 }
             }
-            return result ? _mapper.Map<DeviceModel>(device) : throw new SystemException("Unable to complete requested action!");
+        }
+
+        private DeviceModel ExecuteRequest(int deviceId, NameValueCollection values)
+        {
+            lock (LockManager.GetDeviceLock(deviceId))
+            {
+                var device = _context.Device.Single(d => d.Id == deviceId);
+                if (device.TryUpdateValues(values))
+                {
+                    _context.SaveChanges();
+                    return _mapper.Map<DeviceModel>(device);
+                }
+                else
+                {
+                    throw new SystemException("Unable to complete requested action!");
+                }
+            }
         }
 
         private static bool HandleRetrieveStateRequest(Uri uri, Device device)
         {
             var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
             var json = result.Content.ReadAsStringAsync().Result;
-            var values = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            var values = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(json).ToNameValueCollection();
             return result.IsSuccessStatusCode is not false && device.TryUpdateValues(values);
         }
 
@@ -112,22 +141,6 @@ namespace NetHome.Core.Services
         {
             var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
             return result.IsSuccessStatusCode;
-        }
-
-        public async Task StateChangedDW(string ip, string state)
-        {
-            DWSensor dw = (DWSensor)await _context.Device.SingleAsync(d => d.IpAdress == ip && d.GetType() == typeof(DWSensor));
-            bool newValue = state == "True" || (state == "False" ? false : throw new InvalidOperationException());
-            dw.IsOpen = newValue;
-            _context.SaveChanges();
-        }
-
-        public async Task StateChangedHT(string ip, int hum, double temp)
-        {
-            THSensor th = (THSensor)await _context.Device.SingleAsync(d => d.IpAdress == ip && d.GetType() == typeof(THSensor));
-            th.Humidity = hum;
-            th.Temperature = temp;
-            _context.SaveChanges();
         }
     }
 }

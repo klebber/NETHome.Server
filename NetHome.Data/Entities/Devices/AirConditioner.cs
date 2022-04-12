@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,17 +18,31 @@ namespace NetHome.Data.Entities.Devices
 
         public override Uri ChangeState(Device newValue)
         {
-            throw new NotImplementedException();
+            AirConditioner air = (AirConditioner)newValue;
+            return !ValidateValues(air)
+                ? null
+                : Model switch
+                {
+                    "diy" => GetDiyUriAndSetValues(air),
+                    _ => throw new NotImplementedException(),
+                };
+        }
+
+        private Uri GetDiyUriAndSetValues(AirConditioner air)
+        {
+            throw new NotImplementedException(); //TODO
+        }
+
+        private bool ValidateValues(AirConditioner air)
+        {
+            throw new NotImplementedException();//TODO
         }
 
         public override Uri RetrieveStateUri()
         {
-            throw new NotImplementedException();
+            return new Uri("http://localhost");
         }
 
-        public override bool TryUpdateValues(Dictionary<string,string> values)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool TryUpdateValues(NameValueCollection values) => throw new InvalidOperationException();
     }
 }
