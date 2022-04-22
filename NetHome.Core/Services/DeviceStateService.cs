@@ -9,6 +9,7 @@ using NetHome.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -47,12 +48,12 @@ namespace NetHome.Core.Services
 
         public async Task StateChanged(string ip)
         {
-            var deviceId = await _context.Device.Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
+            var deviceId = await _context.Device.Include(d => d.Room).Include(d => d.Type).Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
             ExecuteRequest(deviceId);
         }
         public async Task StateChanged(string ip, NameValueCollection values)
         {
-            var deviceId = await _context.Device.Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
+            var deviceId = await _context.Device.Include(d => d.Room).Include(d => d.Type).Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
             ExecuteRequest(deviceId, values);
         }
 
@@ -79,7 +80,7 @@ namespace NetHome.Core.Services
         {
             lock (LockManager.GetDeviceLock(deviceId))
             {
-                var device = _context.Device.Single(d => d.Id == deviceId);
+                var device = _context.Device.Include(d => d.Room).Include(d => d.Type).Single(d => d.Id == deviceId);
                 var uri = device.RetrieveStateUri();
                 if (uri is null)
                     throw new SystemException("Unable to complete requested action!");
@@ -98,7 +99,7 @@ namespace NetHome.Core.Services
         {
             lock (LockManager.GetDeviceLock(deviceId))
             {
-                var device = _context.Device.Single(d => d.Id == deviceId);
+                var device = _context.Device.Include(d => d.Room).Include(d => d.Type).Single(d => d.Id == deviceId);
                 var uri = device.ChangeState(newValue);
                 if (uri is not null && HandleChangeStateRequest(uri))
                 {
@@ -116,7 +117,7 @@ namespace NetHome.Core.Services
         {
             lock (LockManager.GetDeviceLock(deviceId))
             {
-                var device = _context.Device.Single(d => d.Id == deviceId);
+                var device = _context.Device.Include(d => d.Room).Include(d => d.Type).Single(d => d.Id == deviceId);
                 if (device.TryUpdateValues(values))
                 {
                     _context.SaveChanges();
@@ -139,8 +140,16 @@ namespace NetHome.Core.Services
 
         private static bool HandleChangeStateRequest(Uri uri)
         {
-            var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
-            return result.IsSuccessStatusCode;
+            try
+            {
+                var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+            }
+            return false;
         }
     }
 }
