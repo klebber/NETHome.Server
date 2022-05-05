@@ -1,16 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using NetHome.API.Helpers;
 using NetHome.API.Middleware;
 using NetHome.Common.JsonConverters;
 using NetHome.Common.Models;
@@ -19,13 +14,8 @@ using NetHome.Core.Services;
 using NetHome.Data;
 using NetHome.Data.Entities;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace NetHome.API
@@ -75,8 +65,7 @@ namespace NetHome.API
             });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ElevatedRights", policy =>
-                  policy.RequireRole("Owner", "Admin"));
+                options.AddPolicy("ElevatedRights", policy => policy.RequireRole("Owner", "Admin"));
             });
             services.AddDbContext<NetHomeContext>(options => options.UseSqlite(Configuration.GetConnectionString("NetHomeContextConnection")));
             services.AddIdentityCore<User>(options => 
@@ -89,15 +78,13 @@ namespace NetHome.API
                 options.Password.RequiredLength = 4;
             }).AddRoles<IdentityRole>()
               .AddEntityFrameworkStores<NetHomeContext>();
-            services.AddSignalR(options =>
-            {
-                options.KeepAliveInterval = TimeSpan.FromSeconds(3);
-                options.ClientTimeoutInterval = TimeSpan.FromSeconds(6);
-            });
+            services.AddSingleton<IWebSocketManager, WebSocketManager>();
+            services.AddScoped<IWebSocketHandler, WebSocketHandler>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IDeviceService, DeviceService>();
+            services.AddScoped<IStateChangeNotifyService, StateChangeNotifyService>();
             services.AddScoped<IDeviceStateService, DeviceStateService>();
             services.AddControllers()
             .AddJsonOptions(options =>
@@ -117,6 +104,12 @@ namespace NetHome.API
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseWebSockets(new WebSocketOptions()
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(10)
+            });
+            app.UseMiddleware<WebSocketMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

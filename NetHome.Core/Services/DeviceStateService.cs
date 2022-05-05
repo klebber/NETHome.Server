@@ -22,39 +22,48 @@ namespace NetHome.Core.Services
         private readonly NetHomeContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
-        private static readonly HttpClient client = new();
+        private readonly IStateChangeNotifyService _changeNotifyService;
 
         public DeviceStateService(NetHomeContext context,
             UserManager<User> userManager,
-            IMapper mapper)
+            IMapper mapper,
+            IStateChangeNotifyService changeNotifyService)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _changeNotifyService = changeNotifyService;
+
         }
 
         public async Task<DeviceModel> ChangeState(DeviceModel deviceModel, string userId)
         {
             await CheckExistenceAndAccess(deviceModel.Id, userId);
             var newValue = _mapper.Map<Device>(deviceModel);
-            return ExecuteRequest(deviceModel.Id, newValue);
+            var device = ExecuteRequest(deviceModel.Id, newValue);
+            await _changeNotifyService.NotifyStateChangedAsync(device);
+            return device;
         }
 
         public async Task<DeviceModel> RefreshState(int deviceId, string userId)
         {
             await CheckExistenceAndAccess(deviceId, userId);
-            return ExecuteRequest(deviceId);
+            var device = ExecuteRequest(deviceId);
+            await _changeNotifyService.NotifyStateChangedAsync(device);
+            return device;
         }
 
         public async Task StateChanged(string ip)
         {
             var deviceId = await _context.Device.Include(d => d.Room).Include(d => d.Type).Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
-            ExecuteRequest(deviceId);
+            var device = ExecuteRequest(deviceId);
+            await _changeNotifyService.NotifyStateChangedAsync(device);
         }
         public async Task StateChanged(string ip, NameValueCollection values)
         {
             var deviceId = await _context.Device.Include(d => d.Room).Include(d => d.Type).Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
-            ExecuteRequest(deviceId, values);
+            var device = ExecuteRequest(deviceId, values);
+            await _changeNotifyService.NotifyStateChangedAsync(device);
         }
 
         private async Task CheckExistenceAndAccess(int deviceId, string userId)
@@ -132,6 +141,7 @@ namespace NetHome.Core.Services
 
         private static bool HandleRetrieveStateRequest(Uri uri, Device device)
         {
+            var client = new HttpClient();
             var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
             var json = result.Content.ReadAsStringAsync().Result;
             var values = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(json).ToNameValueCollection();
@@ -142,6 +152,7 @@ namespace NetHome.Core.Services
         {
             try
             {
+                var client = new HttpClient();
                 var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
                 return result.IsSuccessStatusCode;
             }
