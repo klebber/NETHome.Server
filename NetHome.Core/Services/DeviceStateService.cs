@@ -23,17 +23,19 @@ namespace NetHome.Core.Services
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IStateChangeNotifyService _changeNotifyService;
+        private readonly IHttpRequestHandler _httpHandler;
 
         public DeviceStateService(NetHomeContext context,
             UserManager<User> userManager,
             IMapper mapper,
-            IStateChangeNotifyService changeNotifyService)
+            IStateChangeNotifyService changeNotifyService,
+            IHttpRequestHandler httpHandler)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
             _changeNotifyService = changeNotifyService;
-
+            _httpHandler = httpHandler;
         }
 
         public async Task<DeviceModel> ChangeState(DeviceModel deviceModel, string userId)
@@ -139,21 +141,19 @@ namespace NetHome.Core.Services
             }
         }
 
-        private static bool HandleRetrieveStateRequest(Uri uri, Device device)
+        private bool HandleRetrieveStateRequest(Uri uri, Device device)
         {
-            var client = new HttpClient();
-            var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
+            var result = _httpHandler.Get(uri);
             var json = result.Content.ReadAsStringAsync().Result;
             var values = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(json).ToNameValueCollection();
             return result.IsSuccessStatusCode is not false && device.TryUpdateValues(values);
         }
 
-        private static bool HandleChangeStateRequest(Uri uri)
+        private bool HandleChangeStateRequest(Uri uri)
         {
             try
             {
-                var client = new HttpClient();
-                var result = client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
+                var result = _httpHandler.Get(uri);
                 return result.IsSuccessStatusCode;
             }
             catch (Exception e)

@@ -78,6 +78,7 @@ namespace NetHome.API
                 options.Password.RequiredLength = 4;
             }).AddRoles<IdentityRole>()
               .AddEntityFrameworkStores<NetHomeContext>();
+            services.AddScoped<IHttpRequestHandler, HttpRequestHandler>();
             services.AddSingleton<IWebSocketManager, WebSocketManager>();
             services.AddScoped<IWebSocketHandler, WebSocketHandler>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
