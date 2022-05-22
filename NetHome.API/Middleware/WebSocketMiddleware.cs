@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using NetHome.Core.Exceptions;
-using NetHome.Core.Services;
-using System.Diagnostics;
-using System.Net.WebSockets;
+﻿using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using NetHome.Core.Exceptions;
+using NetHome.Core.Services;
 
 namespace NetHome.API.Middleware
 {

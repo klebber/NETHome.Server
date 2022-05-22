@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NetHome.API.Helpers;
 using NetHome.Common.Models;
 using NetHome.Core.Services;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace NetHome.API.Controllers
 {

@@ -1,15 +1,15 @@
-﻿using AutoMapper;
-using NetHome.Common.Models;
-using NetHome.Data;
-using NetHome.Data.Entities;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using NetHome.Core.Exceptions;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using System;
+using Microsoft.EntityFrameworkCore;
 using NetHome.Common;
+using NetHome.Common.Models;
+using NetHome.Core.Exceptions;
+using NetHome.Data;
+using NetHome.Data.Entities;
 
 namespace NetHome.Core.Services
 {
@@ -116,19 +116,19 @@ namespace NetHome.Core.Services
 
         private void ValidatePayload(DevicePayload devicePayload)
         {
-            if (!Uri.IsWellFormedUriString(devicePayload.IpAdress, UriKind.Absolute)) 
+            if (!Uri.IsWellFormedUriString(devicePayload.IpAdress, UriKind.Absolute))
                 throw new ValidationException("Invalid ip adress!");
-            if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.IpAdress == devicePayload.IpAdress)) 
+            if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.IpAdress == devicePayload.IpAdress))
                 throw new ValidationException("Device with this ip adress exists!");
-            if (string.IsNullOrWhiteSpace(devicePayload.Device.Name)) 
+            if (string.IsNullOrWhiteSpace(devicePayload.Device.Name))
                 throw new ValidationException("Invalid Name!");
-            if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.Name == devicePayload.Device.Name)) 
+            if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.Name == devicePayload.Device.Name))
                 throw new ValidationException("Device name is already in use!");
-            if (string.IsNullOrWhiteSpace(devicePayload.Device.Model)) 
+            if (string.IsNullOrWhiteSpace(devicePayload.Device.Model))
                 throw new ValidationException("Invalid Model!");
-            if (!_context.Room.Any(r => r.Name == devicePayload.Device.Room)) 
+            if (!_context.Room.Any(r => r.Name == devicePayload.Device.Room))
                 throw new ValidationException("Invalid Room!");
-            if (!_context.DeviceType.Any(t => t.Name == devicePayload.Device.Type)) 
+            if (!_context.DeviceType.Any(t => t.Name == devicePayload.Device.Type))
                 throw new ValidationException("Invalid Type!");
         }
 

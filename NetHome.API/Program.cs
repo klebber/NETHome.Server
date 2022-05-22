@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
 using System;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using NetHome.API.Middleware;
 using NetHome.Common.JsonConverters;
 using NetHome.Common.Models;
-using NetHome.Core.Services;
-using NetHome.Data.Entities;
-using NetHome.Data;
-using System.Security.Claims;
 using NetHome.Core.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using NetHome.API.Middleware;
+using NetHome.Core.Services;
+using NetHome.Data;
+using NetHome.Data.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -100,3 +100,5 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+app.Run();

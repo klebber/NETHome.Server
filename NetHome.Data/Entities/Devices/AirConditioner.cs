@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetHome.Data.Entities.Devices
 {
@@ -76,7 +73,7 @@ namespace NetHome.Data.Entities.Devices
 
             array[9] = (Ison ? 4 : 0) + (TimerSet ? 2 : 0);
 
-            var bytes = array.Select(a => 
+            var bytes = array.Select(a =>
             {
                 var s = Convert.ToString(a, 2);
                 return s.PadLeft(8, '0');

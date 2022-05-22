@@ -1,13 +1,10 @@
-﻿using NetHome.Core.Helpers;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NetHome.Core.Helpers;
 
 namespace NetHome.Core.Services
 {
@@ -32,7 +29,7 @@ namespace NetHome.Core.Services
             if (socketRecord.Socket.State is WebSocketState.Open or WebSocketState.CloseReceived)
                 await socketRecord.Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, reason, CancellationToken.None);
             else if (!socketRecord.TokenSource.IsCancellationRequested)
-                socketRecord.TokenSource.Cancel(); 
+                socketRecord.TokenSource.Cancel();
             _manager.RemoveSocket(socketRecord);
         }
 

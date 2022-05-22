@@ -1,14 +1,11 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using NetHome.Common;
 using NetHome.Common.Models;
 using NetHome.Core.Exceptions;
 using NetHome.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetHome.Core.Services
 {
@@ -32,7 +29,7 @@ namespace NetHome.Core.Services
         public async Task<LoginResponse> Login(LoginRequest login)
         {
             var user = await _userManager.FindByNameAsync(login.Username);
-            if (user is null || !await _userManager.CheckPasswordAsync(user, login.Password)) 
+            if (user is null || !await _userManager.CheckPasswordAsync(user, login.Password))
                 throw new AuthenticationException("Wrong username or password!");
             var token = _tokenService.GenerateToken(user);
             var userModel = _mapper.Map<UserModel>(user);
@@ -52,7 +49,7 @@ namespace NetHome.Core.Services
             var user = _mapper.Map<User>(register);
             user.DateOfRegistration = DateTime.Now;
             var result = await _userManager.CreateAsync(user, register.Password);
-            if(!result.Succeeded)
+            if (!result.Succeeded)
                 throw new ValidationException("Unable to create account!");
         }
 
