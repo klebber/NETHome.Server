@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -42,7 +41,7 @@ namespace NetHome.Core.Services
         {
             await CheckExistenceAndAccess(deviceModel.Id, userId);
             var newValue = _mapper.Map<Device>(deviceModel);
-            var device = ExecuteRequest(deviceModel.Id, newValue);
+            var device = ExecuteStateChange(deviceModel.Id, newValue);
             await _changeNotifyService.NotifyStateChangedAsync(device);
             return device;
         }
@@ -50,21 +49,15 @@ namespace NetHome.Core.Services
         public async Task<DeviceModel> RefreshState(int deviceId, string userId)
         {
             await CheckExistenceAndAccess(deviceId, userId);
-            var device = ExecuteRequest(deviceId);
+            var device = ExecuteStateFetchAndUpdate(deviceId);
             await _changeNotifyService.NotifyStateChangedAsync(device);
             return device;
         }
 
-        public async Task StateChanged(string ip)
+        public async Task StateChanged(string ip, NameValueCollection values = null)
         {
             var deviceId = await _context.Device.Include(d => d.Room).Include(d => d.Type).Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
-            var device = ExecuteRequest(deviceId);
-            await _changeNotifyService.NotifyStateChangedAsync(device);
-        }
-        public async Task StateChanged(string ip, NameValueCollection values)
-        {
-            var deviceId = await _context.Device.Include(d => d.Room).Include(d => d.Type).Where(d => d.IpAdress == ip).Select(d => d.Id).SingleAsync();
-            var device = ExecuteRequest(deviceId, values);
+            var device = values is null ? ExecuteStateFetchAndUpdate(deviceId) : ExecuteStateUpdate(deviceId, values);
             await _changeNotifyService.NotifyStateChangedAsync(device);
         }
 
@@ -87,26 +80,7 @@ namespace NetHome.Core.Services
             throw new AuthorizationException("You do not have access to this device!");
         }
 
-        private DeviceModel ExecuteRequest(int deviceId)
-        {
-            lock (LockManager.GetDeviceLock(deviceId))
-            {
-                var device = _context.Device.Include(d => d.Room).Include(d => d.Type).Single(d => d.Id == deviceId);
-                var uri = device.RetrieveStateUri();
-                if (uri is null)
-                    throw new SystemException("Unable to complete requested action!");
-                if (uri.IsLoopback)
-                    return _mapper.Map<DeviceModel>(device);
-                if (HandleRetrieveStateRequest(uri, device))
-                {
-                    _context.SaveChanges();
-                    return _mapper.Map<DeviceModel>(device);
-                }
-                throw new SystemException("Unable to complete requested action!");
-            }
-        }
-
-        private DeviceModel ExecuteRequest(int deviceId, Device newValue)
+        private DeviceModel ExecuteStateChange(int deviceId, Device newValue)
         {
             lock (LockManager.GetDeviceLock(deviceId))
             {
@@ -124,7 +98,27 @@ namespace NetHome.Core.Services
             }
         }
 
-        private DeviceModel ExecuteRequest(int deviceId, NameValueCollection values)
+        private DeviceModel ExecuteStateFetchAndUpdate(int deviceId)
+        {
+            lock (LockManager.GetDeviceLock(deviceId))
+            {
+                var device = _context.Device.Include(d => d.Room).Include(d => d.Type).Single(d => d.Id == deviceId);
+                var uri = device.RetrieveStateUri();
+                if (uri is not null)
+                {
+                    if (uri.IsLoopback)
+                        return _mapper.Map<DeviceModel>(device);
+                    if (HandleRetrieveStateRequest(uri, device))
+                    {
+                        _context.SaveChanges();
+                        return _mapper.Map<DeviceModel>(device);
+                    }
+                }
+                throw new SystemException("Unable to complete requested action!");
+            }
+        }
+
+        private DeviceModel ExecuteStateUpdate(int deviceId, NameValueCollection values)
         {
             lock (LockManager.GetDeviceLock(deviceId))
             {

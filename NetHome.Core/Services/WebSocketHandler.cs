@@ -79,6 +79,10 @@ namespace NetHome.Core.Services
             {
                 await OnDisconnected(socketRequest);
             }
+            catch (OperationCanceledException)
+            {
+                await OnDisconnected(socketRequest);
+            }
             finally
             {
                 socketRequest.Socket.Dispose();
