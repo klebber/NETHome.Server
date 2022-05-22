@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NetHome.Common;
 using NetHome.Common.Models;
 using NetHome.Core.Services;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -38,9 +35,23 @@ namespace NetHome.API.Controllers
 
         [Authorize(Policy = "ElevatedRights")]
         [HttpPost("add")]
-        public async Task Add([FromBody] DeviceModel device)
+        public async Task<DeviceModel> Add([FromBody] DevicePayload device)
         {
-            throw new NotImplementedException();
+            return await _deviceService.Add(device);
+        }
+
+        [Authorize(Policy = "ElevatedRights")]
+        [HttpPost("update")]
+        public async Task<DeviceModel> Update([FromBody] DevicePayload device)
+        {
+            return await _deviceService.Update(device);
+        }
+
+        [Authorize(Policy = "ElevatedRights")]
+        [HttpPost("delete")]
+        public async void Delete([FromBody] DeviceModel device)
+        {
+            await _deviceService.Delete(device);
         }
     }
 }
