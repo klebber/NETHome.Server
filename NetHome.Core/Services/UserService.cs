@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using NetHome.Common;
-using NetHome.Common.Models;
 using NetHome.Core.Exceptions;
 using NetHome.Data.Entities;
 

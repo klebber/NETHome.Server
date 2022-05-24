@@ -4,7 +4,7 @@ using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NetHome.API.Helpers;
-using NetHome.Common.Models;
+using NetHome.Common;
 using NetHome.Core.Services;
 
 namespace NetHome.API.Controllers

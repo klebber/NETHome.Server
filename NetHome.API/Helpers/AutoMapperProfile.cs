@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using NetHome.Common;
-using NetHome.Common.Models;
-using NetHome.Common.Models.Devices;
 using NetHome.Data.Entities;
 using NetHome.Data.Entities.Devices;
 

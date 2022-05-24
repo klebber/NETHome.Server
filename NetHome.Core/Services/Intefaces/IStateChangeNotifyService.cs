@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using NetHome.Common.Models;
+using NetHome.Common;
 
 namespace NetHome.Core.Services
 {

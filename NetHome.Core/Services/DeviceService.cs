@@ -6,7 +6,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NetHome.Common;
-using NetHome.Common.Models;
 using NetHome.Core.Exceptions;
 using NetHome.Data;
 using NetHome.Data.Entities;

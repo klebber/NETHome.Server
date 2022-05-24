@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NetHome.Common;
-using NetHome.Common.Models;
 
 namespace NetHome.Core.Services
 {

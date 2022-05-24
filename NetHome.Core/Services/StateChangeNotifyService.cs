@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NetHome.Common.JsonConverters;
-using NetHome.Common.Models;
+using NetHome.Common;
 using NetHome.Data;
 using NetHome.Data.Entities;
 
@@ -47,7 +47,7 @@ namespace NetHome.Core.Services
                 return;
             JsonSerializerOptions options = new();
             options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new RuntimeTypeConverter<DeviceModel>("NetHome.Common.Models.Devices.", "NetHome.Common"));
+            options.Converters.Add(new RuntimeTypeConverter<DeviceModel>());
             string json = JsonSerializer.Serialize(device, options);
             await _handler.SendAsync(ids, json);
         }

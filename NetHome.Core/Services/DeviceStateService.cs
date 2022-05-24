@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NetHome.Common.Models;
+using NetHome.Common;
 using NetHome.Core.Exceptions;
 using NetHome.Core.Helpers;
 using NetHome.Data;
