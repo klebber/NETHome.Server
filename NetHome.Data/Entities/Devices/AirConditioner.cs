@@ -20,7 +20,7 @@ namespace NetHome.Data.Entities.Devices
             SetValues(air);
             return Model switch
             {
-                "diy" => new Uri($"http://{IpAdress}/ir?code={GenerateDiyCode()}"),
+                "diy" => new Uri($"{IpAdress}/ir?code={GenerateDiyCode()}"),
                 _ => throw new NotImplementedException(),
             };
         }

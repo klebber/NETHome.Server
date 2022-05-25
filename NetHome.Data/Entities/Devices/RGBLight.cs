@@ -33,9 +33,9 @@ namespace NetHome.Data.Entities.Devices
             if (rgb.Mode != Mode)
             {
                 Mode = rgb.Mode;
-                return new Uri($"http://{IpAdress}/settings/0?mode={rgb.Mode}");
+                return new Uri($"{IpAdress}/settings/0?mode={rgb.Mode}");
             }
-            var baseUri = new Uri($"http://{IpAdress}/light/0");
+            var baseUri = new Uri($"{IpAdress}/light/0");
             var query = new List<string>();
             if (Mode == "white")
             {

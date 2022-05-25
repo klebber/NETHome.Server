@@ -19,7 +19,7 @@ namespace NetHome.Data.Entities.Devices
             switch (Model)
             {
                 case "Shelly 2.5":
-                    var baseUri = new Uri($"http://{IpAdress}/roller/0");
+                    var baseUri = new Uri($"{IpAdress}/roller/0");
                     var uri = new UriBuilder(baseUri);
                     string positionQuery = $"go=to_pos&roller_pos={rs.CurrentPercentage}";
                     uri.Query = positionQuery;

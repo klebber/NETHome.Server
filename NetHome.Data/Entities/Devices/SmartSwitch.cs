@@ -14,7 +14,7 @@ namespace NetHome.Data.Entities.Devices
             {
                 case "Shelly 1":
                 case "Shelly 1PM":
-                    var baseUri = new Uri($"http://{IpAdress}/relay/0");
+                    var baseUri = new Uri($"{IpAdress}/relay/0");
                     var uri = new UriBuilder(baseUri);
                     string isonQuery = $"turn={(Ison ? "on" : "off")}";
                     uri.Query = isonQuery;
@@ -24,7 +24,7 @@ namespace NetHome.Data.Entities.Devices
             }
         }
 
-        public override Uri RetrieveStateUri() => new($"http://{IpAdress}/relay/0");
+        public override Uri RetrieveStateUri() => new($"{IpAdress}/relay/0");
 
 
         public override bool TryUpdateValues(NameValueCollection values)

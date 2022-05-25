@@ -90,17 +90,18 @@ namespace NetHome.Core.Services
         {
             ValidatePayload(devicePayload);
             var device = _mapper.Map<Device>(devicePayload.Device);
+            device.Id = 0;
             device.DateAdded = DateTime.Now;
             SetPayloadValues(devicePayload, device);
-            var result = _context.Add(device);
+            var result = _context.Add(device).Entity;
             await _context.SaveChangesAsync();
             return _mapper.Map<DeviceModel>(result);
         }
 
         public async Task<DeviceModel> Update(DevicePayload devicePayload)
         {
+            var device = _context.Device.Include(d => d.Room).Include(d => d.Type).Single(d => d.Id == devicePayload.Device.Id);
             ValidatePayload(devicePayload);
-            var device = _context.Device.Single(d => d.Id == devicePayload.Device.Id);
             SetPayloadValues(devicePayload, device);
             await _context.SaveChangesAsync();
             return _mapper.Map<DeviceModel>(device);
@@ -117,10 +118,10 @@ namespace NetHome.Core.Services
         {
             if (!Uri.IsWellFormedUriString(devicePayload.IpAdress, UriKind.Absolute))
                 throw new ValidationException("Invalid ip adress!");
-            if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.IpAdress == devicePayload.IpAdress))
-                throw new ValidationException("Device with this ip adress exists!");
             if (string.IsNullOrWhiteSpace(devicePayload.Device.Name))
                 throw new ValidationException("Invalid Name!");
+            if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.IpAdress == devicePayload.IpAdress))
+                throw new ValidationException("Device with this ip adress exists!");
             if (_context.Device.Any(d => d.Id != devicePayload.Device.Id && d.Name == devicePayload.Device.Name))
                 throw new ValidationException("Device name is already in use!");
             if (string.IsNullOrWhiteSpace(devicePayload.Device.Model))
@@ -136,8 +137,10 @@ namespace NetHome.Core.Services
             device.IpAdress = devicePayload.IpAdress;
             device.DeviceUsername = devicePayload.DeviceUsername;
             device.DevicePassword = devicePayload.DevicePassword;
-            device.Room = _context.Room.Single(r => r.Name == device.Room.Name);
-            device.Type = _context.DeviceType.Single(t => t.Name == device.Type.Name);
+            device.Name = devicePayload.Device.Name;
+            device.Model = devicePayload.Device.Model;
+            device.Room = _context.Room.Single(r => r.Name == devicePayload.Device.Room);
+            device.Type = _context.DeviceType.Single(t => t.Name == devicePayload.Device.Type);
         }
     }
 }
