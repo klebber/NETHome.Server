@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -32,21 +33,21 @@ namespace NetHome.API.Controllers
             return await _deviceService.GetAllDevices(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
-        [Authorize(Policy = "ElevatedRights")]
+        [Authorize(Roles = "Admin, Owner")]
         [HttpPost("add")]
         public async Task<DeviceModel> Add([FromBody] DevicePayload device)
         {
             return await _deviceService.Add(device);
-        }
+}
 
-        [Authorize(Policy = "ElevatedRights")]
+        [Authorize(Roles = "Admin, Owner")]
         [HttpPost("update")]
         public async Task<DeviceModel> Update([FromBody] DevicePayload device)
         {
             return await _deviceService.Update(device);
         }
 
-        [Authorize(Policy = "ElevatedRights")]
+        [Authorize(Roles = "Admin, Owner")]
         [HttpPost("delete")]
         public async void Delete([FromBody] DeviceModel device)
         {

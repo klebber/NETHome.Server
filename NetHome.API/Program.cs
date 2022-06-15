@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 services.AddAuthentication(OptionsHelper.AuthenticationOptions()).AddJwtBearer(OptionsHelper.JwtBearerOptions(builder.Configuration["Jwt:Key"]));
-services.AddAuthorization(OptionsHelper.AuthorizationOptions());
+services.AddAuthorization();
 services.AddDbContext<NetHomeContext>(options => options.UseSqlite(builder.Configuration["ConnectionStrings:NetHomeContextConnection"]));
 services.AddIdentityCore<User>(OptionsHelper.IdentityOptions()).AddRoles<IdentityRole>().AddEntityFrameworkStores<NetHomeContext>();
 services.AddScoped<IHttpRequestHandler, HttpRequestHandler>();

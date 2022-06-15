@@ -58,6 +58,9 @@ namespace NetHome.Core.Services
         {
             var user = await _context.User
                 .Include(u => u.Devices)
+                .ThenInclude(d => d.Room)
+                .Include(u => u.Devices)
+                .ThenInclude(d => d.Type)
                 .SingleAsync(u => u.Id == userId);
             var devices = user.Devices
                 .OrderBy(d => d.Room.Id)

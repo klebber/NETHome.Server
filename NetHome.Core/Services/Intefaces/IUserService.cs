@@ -7,6 +7,13 @@ namespace NetHome.Core.Services
     {
         Task<LoginResponse> Login(LoginRequest loginUser);
         Task Register(RegisterRequest registerUser);
-        Task<UserModel> Validate(string id);
+        Task<UserModel> Validate(string userId);
+        Task<UserModel> UpdateUser(UserModel userModel, string senderId);
+        Task DeleteUser(string userId);
+        Task GiveUserDeviceAccess(DeviceAccessPayload deviceAccess);
+        Task RemoveUserDeviceAccess(DeviceAccessPayload deviceAccess);
+        Task ChangePassword(PasswordChangePayload payload, string senderId);
+        Task LockUser(UserModel userModel);
+        Task UnlockUser(UserModel userModel);
     }
 }

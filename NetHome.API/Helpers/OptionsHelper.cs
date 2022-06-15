@@ -37,6 +37,12 @@ namespace NetHome.API.Helpers
                     var id = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
                     var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
                     var user = await userManager.FindByIdAsync(id) ?? throw new AuthorizationException("Unable to verify token!");
+                    if (user.LockoutEnd > DateTime.Now)
+                    {
+                        var timeSpan = user.LockoutEnd - DateTime.Now;
+                        var years = timeSpan.Value.Days / 365;
+                        throw new AuthorizationException($"Your account has been locked for {years} years. Please contact an owner.");
+                    }
                     var claims = new ClaimsIdentity();
                     foreach (string role in await userManager.GetRolesAsync(user))
                         claims.AddClaim(new Claim(ClaimTypes.Role, role));
@@ -48,11 +54,6 @@ namespace NetHome.API.Helpers
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        };
-
-        public static Action<AuthorizationOptions> AuthorizationOptions() => options =>
-        {
-            options.AddPolicy("ElevatedRights", policy => policy.RequireRole("Owner", "Admin"));
         };
 
         public static Action<IdentityOptions> IdentityOptions() => options =>

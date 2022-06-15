@@ -67,9 +67,9 @@ namespace NetHome.Data.Entities.Devices
                 Blue = rgb.Blue;
                 White = rgb.White;
                 query.Add($"red={Red}");
-                query.Add($"red={Green}");
-                query.Add($"red={Blue}");
-                query.Add($"red={White}");
+                query.Add($"green={Green}");
+                query.Add($"blue={Blue}");
+                query.Add($"white={White}");
             }
             var uriBuilder = new UriBuilder(baseUri)
             {
