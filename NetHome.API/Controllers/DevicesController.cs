@@ -26,6 +26,13 @@ namespace NetHome.API.Controllers
             return await _deviceService.GetDevice(id, User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpGet("getpayload")]
+        public async Task<DevicePayload> GetPayload([FromQuery] int id)
+        {
+            return await _deviceService.GetDevicePayload(id);
+        }
+
         [Authorize]
         [HttpGet("getall")]
         public async Task<ICollection<DeviceModel>> GetAll()
@@ -49,9 +56,51 @@ namespace NetHome.API.Controllers
 
         [Authorize(Roles = "Admin, Owner")]
         [HttpPost("delete")]
-        public async void Delete([FromBody] DeviceModel device)
+        public async Task Delete([FromBody] DeviceModel device)
         {
             await _deviceService.Delete(device);
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpGet("getrooms")]
+        public async Task<ICollection<string>> GetRooms()
+        {
+            return await _deviceService.GetRooms();
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpGet("gettypes")]
+        public async Task<ICollection<string>> GetDeviceTypes()
+        {
+            return await _deviceService.GetDeviceTypes();
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpPost("addroom")]
+        public async Task AddRoom([FromBody] string roomName)
+        {
+            await _deviceService.AddRoom(roomName);
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpPost("deleteroom")]
+        public async Task DeleteRoom([FromBody] string roomName)
+        {
+            await _deviceService.DeleteRoom(roomName);
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpPost("addtype")]
+        public async Task AddDeviceType([FromBody] string typeName)
+        {
+            await _deviceService.AddType(typeName);
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpPost("deletetype")]
+        public async Task DeleteDeviceType([FromBody] string typeName)
+        {
+            await _deviceService.DeleteType(typeName);
         }
     }
 }

@@ -36,6 +36,8 @@ namespace NetHome.Core.Services
         public async Task<LoginResponse> Login(LoginRequest login)
         {
             var user = await _userManager.FindByNameAsync(login.Username);
+            if (user is null)
+                throw new AuthorizationException("Wrong username or password!");
             CheckIfLocked(user);
             if (user is null || !await _userManager.CheckPasswordAsync(user, login.Password))
                 throw new AuthenticationException("Wrong username or password!");
@@ -65,6 +67,8 @@ namespace NetHome.Core.Services
         public async Task<UserModel> Validate(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+            if (user is null)
+                throw new AuthorizationException("Wrong username or password!");
             CheckIfLocked(user);
             var userModel = _mapper.Map<UserModel>(user);
             userModel.Roles = await _userManager.GetRolesAsync(user);

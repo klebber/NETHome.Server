@@ -9,6 +9,7 @@ using NetHome.Common;
 using NetHome.Core.Exceptions;
 using NetHome.Data;
 using NetHome.Data.Entities;
+using NetHome.Data.Entities.Devices;
 
 namespace NetHome.Core.Services
 {
@@ -29,7 +30,7 @@ namespace NetHome.Core.Services
 
         public async Task<DeviceModel> GetDevice(int deviceId, string userId)
         {
-            var device = await _context.Device.SingleAsync(d => d.Id == deviceId);
+            var device = await _context.Device.Include(d => d.Room).Include(d => d.Type).SingleAsync(d => d.Id == deviceId);
             await CheckDeviceAccess(deviceId, userId);
             var devicemodel = _mapper.Map<DeviceModel>(device);
             return devicemodel;
@@ -144,6 +145,73 @@ namespace NetHome.Core.Services
             device.Model = devicePayload.Device.Model;
             device.Room = _context.Room.Single(r => r.Name == devicePayload.Device.Room);
             device.Type = _context.DeviceType.Single(t => t.Name == devicePayload.Device.Type);
+        }
+
+        public async Task<ICollection<string>> GetRooms()
+        {
+            return await _context.Room.Select(r => r.Name).ToListAsync();
+        }
+
+        public async Task<ICollection<string>> GetDeviceTypes()
+        {
+            return await _context.DeviceType.Select(t => t.Name).ToListAsync();
+        }
+
+        public async Task<DevicePayload> GetDevicePayload(int deviceId)
+        {
+            var device = await _context.Device.Include(d => d.Room).Include(d => d.Type).SingleAsync(d => d.Id == deviceId);
+            var devicemodel = _mapper.Map<DeviceModel>(device);
+            return new DevicePayload
+            {
+                Device = devicemodel,
+                IpAdress = device.IpAdress,
+                DeviceUsername = device.DeviceUsername,
+                DevicePassword = device.DevicePassword
+            };
+        }
+
+        public async Task AddRoom(string roomName)
+        {
+            if (string.IsNullOrWhiteSpace(roomName))
+                throw new ArgumentException("No value provided!");
+            if (_context.Room.Any(r => r.Name == roomName))
+                throw new InvalidOperationException("Room with the same name already exists!");
+            await _context.Room.AddAsync(new Room()
+            {
+                Name = roomName
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRoom(string roomName)
+        {
+            var room = await _context.Room.Include(r => r.Devices).SingleAsync(r => r.Name == roomName);
+            if (room.Devices.Count != 0)
+                throw new InvalidOperationException("Cannot delete room that contains devices!");
+            _context.Room.Remove(await _context.Room.SingleAsync(r => r.Name == roomName));
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddType(string typeName)
+        {
+            if (string.IsNullOrWhiteSpace(typeName))
+                throw new ArgumentException("No value provided!");
+            if (_context.DeviceType.Any(t => t.Name == typeName))
+                throw new InvalidOperationException("Type with the same name already exists!");
+            await _context.DeviceType.AddAsync(new DeviceType()
+            {
+                Name = typeName
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteType(string typeName)
+        {
+            var type = await _context.DeviceType.Include(t => t.Devices).SingleAsync(t => t.Name == typeName);
+            if (type.Devices.Count != 0)
+                throw new InvalidOperationException("Cannot delete type if devices of this type exist!");
+            _context.DeviceType.Remove(await _context.DeviceType.SingleAsync(t => t.Name == typeName));
+            await _context.SaveChangesAsync();
         }
     }
 }
