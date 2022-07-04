@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -51,6 +52,27 @@ namespace NetHome.API.Controllers
         public async Task Delete([FromBody] string userId)
         {
             await _userService.DeleteUser(userId);
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpGet("get")]
+        public async Task<UserModel> GetUser([FromQuery] string id)
+        {
+            return await _userService.GetUser(id);
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpGet("getall")]
+        public async Task<ICollection<UserModel>> GetAllUsers()
+        {
+            return await _userService.GetAllUsers();
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpGet("getaccessible")]
+        public async Task<ICollection<DeviceModel>> GetAccess([FromQuery] string userId)
+        {
+            return await _userService.GetAccessibleDevices(userId);
         }
 
         [Authorize(Roles = "Owner")]

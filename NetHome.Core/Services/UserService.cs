@@ -153,6 +153,43 @@ namespace NetHome.Core.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UserModel> GetUser(string id)
+        {
+            var user = await _context.User.SingleAsync(u => u.Id == id);
+            var userModel = _mapper.Map<UserModel>(user);
+            userModel.Roles = await _userManager.GetRolesAsync(user);
+            return userModel;
+        }
+
+        public async Task<ICollection<UserModel>> GetAllUsers()
+        {
+            var users = await _context.User.ToListAsync();
+            var userModels = new List<UserModel>();
+            foreach (var u in users)
+            {
+                var um = _mapper.Map<UserModel>(u);
+                um.Roles = await _userManager.GetRolesAsync(u);
+                userModels.Add(um);
+            }
+            return userModels;
+        }
+
+        public async Task<ICollection<DeviceModel>> GetAccessibleDevices(string userId)
+        {
+            var user = await _context.User
+                .Include(u => u.Devices)
+                .ThenInclude(d => d.Room)
+                .Include(u => u.Devices)
+                .ThenInclude(d => d.Type)
+                .SingleAsync(u => u.Id == userId);
+            var devices = user.Devices
+                .OrderBy(d => d.Room.Id)
+                .ThenBy(d => d.Type.Id)
+                .ToList();
+            var devicemodels = _mapper.Map<List<Device>, List<DeviceModel>>(devices);
+            return devicemodels;
+        }
+
         public async Task GiveUserDeviceAccess(DeviceAccessPayload deviceAccess)
         {
             var user = await _context.User.Include(u => u.Devices).SingleAsync(u => u.Id == deviceAccess.UserId);
