@@ -11,6 +11,8 @@ namespace NetHome.API.Helpers
         {
             CreateMap<User, UserModel>();
             CreateMap<RegisterRequest, User>();
+            CreateMap<Room, RoomModel>();
+            CreateMap<DeviceType, DeviceTypeModel>();
 
             CreateMap<Device, DeviceModel>()
                 .ForMember(r => r.Room, opt => opt.MapFrom(src => src.Room.Name))

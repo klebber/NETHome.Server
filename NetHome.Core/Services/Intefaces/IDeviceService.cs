@@ -12,11 +12,11 @@ namespace NetHome.Core.Services
         Task<DeviceModel> Add(DevicePayload devicePayload);
         Task<DeviceModel> Update(DevicePayload devicePayload);
         Task Delete(DeviceModel model);
-        Task<ICollection<string>> GetRooms();
-        Task<ICollection<string>> GetDeviceTypes();
-        Task AddRoom(string roomName);
-        Task DeleteRoom(string roomName);
-        Task AddType(string typeName);
-        Task DeleteType(string typeName);
+        Task<ICollection<RoomModel>> GetRooms();
+        Task<ICollection<DeviceTypeModel>> GetDeviceTypes();
+        Task AddRoom(RoomModel room);
+        Task DeleteRoom(RoomModel room);
+        Task AddType(DeviceTypeModel type);
+        Task DeleteType(DeviceTypeModel type);
     }
 }

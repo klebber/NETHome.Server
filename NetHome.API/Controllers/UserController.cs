@@ -54,6 +54,13 @@ namespace NetHome.API.Controllers
             await _userService.DeleteUser(userId);
         }
 
+        [Authorize]
+        [HttpGet("getown")]
+        public async Task<UserModel> GetOwnUserData()
+        {
+            return await _userService.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+
         [Authorize(Roles = "Owner")]
         [HttpGet("get")]
         public async Task<UserModel> GetUser([FromQuery] string id)

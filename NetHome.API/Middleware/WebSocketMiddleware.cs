@@ -24,9 +24,7 @@ namespace NetHome.API.Middleware
                 var userId = context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 if (userId is null) throw new AuthenticationException("WebSocket authentication error!");
                 var wsr = _webSocketHandler.OnConnected(userId, socket);
-                Debug.WriteLine("WebSocket middleware -> User connected: " + userId);
                 await _webSocketHandler.ReceiveAsync(wsr);
-                Debug.WriteLine("WebSocket middleware -> Pipeline ending for user: " + userId);
             }
             else
             {
